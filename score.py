@@ -26,7 +26,10 @@ import re
 import statistics
 from pathlib import Path
 
-import jiwer
+try:
+    import jiwer
+except ModuleNotFoundError as e:
+    raise SystemExit(f'{e.name} is not installed: pip install -r requirements.txt') from None
 
 from harness import AUDIO_SETS, HERE, RESULTS, audio_set, load_context, load_manifest, read_results, real_speakers, results_path
 from normalise import best_ratio, norm, script_ok, word_present
@@ -37,24 +40,28 @@ MAX_SPOKEN_CHARS = 280
 TRANSCRIBERS = ('openai_stt', 'soniox', 'soniox_rt', 'soniox_rt_live', 'azure_fast')
 AUDIO_NATIVE = ('gemini',)
 
-# List prices in US$, as read from the vendors' pages in October 2026. Prices change: read the page before you
-# trust a cost. None means unread, and the cost column says so.
+# List prices in US$, each with the day and the page it was read from. They are a snapshot: vendors change
+# prices, and a model served by more than one host is priced by each host, so a row keyed by a host's model
+# id holds that host's price only. Read the page again before you trust a cost. None means unread, and the
+# cost column says so.
 PRICE_STT = {  # by transcriber, or by model for openai_stt
-    'soniox': {'per_audio_hour': 0.10},
-    'soniox_rt': {'per_audio_hour': 0.12},
-    'soniox_rt_live': {'per_audio_hour': 0.12},
-    'azure_fast': {'per_audio_hour': None},
-    'gpt-transcribe': {'per_audio_minute': 0.0045},
-    'whisper-large-v3': {'per_audio_hour': 0.111, 'min_ms': 10_000},
-    'whisper-large-v3-turbo': {'per_audio_hour': 0.04, 'min_ms': 10_000},
+    'soniox': {'per_audio_hour': 0.10},                  # soniox.com/pricing, read 2026-10-04
+    'soniox_rt': {'per_audio_hour': 0.12},               # soniox.com/pricing, real-time, read 2026-10-06
+    'soniox_rt_live': {'per_audio_hour': 0.12},          # the same model, paced live
+    'azure_fast': {'per_audio_hour': None},              # never read
+    'gpt-transcribe': {'per_audio_minute': 0.0045},      # OpenAI's pricing page, read 2026-10-04
+    # Groq's prices for these two ids, from its model pages, read 2026-10-10; a request under 10 s bills as 10 s.
+    'whisper-large-v3': {'per_audio_hour': 0.111, 'min_ms': 10_000},         # (Groq)
+    'whisper-large-v3-turbo': {'per_audio_hour': 0.04, 'min_ms': 10_000},    # (Groq)
 }
 PRICE_AUDIO_NATIVE = {  # per 1M tokens
-    'gemini-2.5-flash': {'text_in': 0.30, 'audio_in': 1.00, 'out': 2.50},
+    'gemini-2.5-flash': {'text_in': 0.30, 'audio_in': 1.00, 'out': 2.50},    # Gemini API pricing, paid tier, read 2026-10-04
 }
 PRICE_TEXT = {  # per 1M tokens
-    'claude-haiku-4-5': {'in': 1.00, 'cached_in': 0.10, 'cache_write': 1.25, 'out': 5.00},
-    'openai/gpt-oss-120b': {'in': 0.15, 'cached_in': 0.075, 'out': 0.60},
-    'openai/gpt-oss-20b': {'in': 0.075, 'cached_in': 0.037, 'out': 0.30},
+    'claude-haiku-4-5': {'in': 1.00, 'cached_in': 0.10, 'cache_write': 1.25, 'out': 5.00},  # Anthropic's pricing table, read 2026-09-25
+    # Groq's prices for these two ids, from each model's page, read 2026-10-09.
+    'openai/gpt-oss-120b': {'in': 0.15, 'cached_in': 0.075, 'out': 0.60},    # (Groq)
+    'openai/gpt-oss-20b': {'in': 0.075, 'cached_in': 0.037, 'out': 0.30},    # (Groq)
 }
 
 

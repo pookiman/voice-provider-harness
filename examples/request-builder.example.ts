@@ -8,7 +8,7 @@
  * instruction and the same four declarations as a Chat Completions body, for a server whose text step is a
  * separate call; the harness can ask for it live through the bridge (README, The bridge).
  *
- * Written with erasable TypeScript only (no enums, no namespaces), so Node 23.6 and later import it as it is.
+ * Written with erasable TypeScript only (no enums, no namespaces), so Node 22.18 and later import it as it is.
  */
 
 export interface Context {

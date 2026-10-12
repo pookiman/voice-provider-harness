@@ -25,11 +25,23 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-import requests
+try:
+    import requests
+except ModuleNotFoundError as e:
+    raise SystemExit(f'{e.name} is not installed: pip install -r requirements.txt') from None
 
 from harness import AUDIO_SETS, HERE, MANIFEST_FILE, RESULTS, AdapterError, Clip, DailyLimit, audio_set, load_manifest, probe, read_results, require, results_path, tts_voices, variant
 
 PROVIDERS = sorted(p.stem for p in (HERE / 'adapters').glob('*.py') if not p.stem.startswith('_'))
+
+
+def adapter_module(name: str):
+    """The provider's adapter; a package missing from a partial install stops the run with the line that installs
+    it, not a stack trace."""
+    try:
+        return importlib.import_module(f'adapters.{name}')
+    except ModuleNotFoundError as e:
+        raise SystemExit(f'adapter {name} needs {e.name}, which is not installed: pip install -r requirements.txt') from None
 
 
 def select(clips: list[Clip], args, needs_audio: bool = True) -> list[Clip]:
@@ -97,8 +109,15 @@ def show_line(r: dict) -> str:
 def check(audio: str) -> None:
     clips = load_manifest(audio)
     print(f'audio set: {audio}; manifest: {MANIFEST_FILE.relative_to(HERE)}')
-    keys = sorted({k for p in PROVIDERS for k in importlib.import_module(f'adapters.{p}').KEYS} | {'OPENAI_API_KEY'})
-    print(f'{len(clips)} lines; keys in this shell: ' + ', '.join(f'{k} {"set" if os.environ.get(k) else "not set"}' for k in keys))
+    keys, missing = {'OPENAI_API_KEY'}, []
+    for p in PROVIDERS:
+        try:
+            keys |= set(importlib.import_module(f'adapters.{p}').KEYS)
+        except ModuleNotFoundError as e:
+            missing.append(f'{p} needs {e.name}')
+    print(f'{len(clips)} lines; keys in this shell: ' + ', '.join(f'{k} {"set" if os.environ.get(k) else "not set"}' for k in sorted(keys)))
+    if missing:
+        print(f'not installed: {"; ".join(missing)}. Run: pip install -r requirements.txt')
     recorded = [c for c in clips if c.exists]
     for c in recorded:
         p = probe(c.path)
@@ -145,7 +164,7 @@ def main() -> None:
             print(show_line(r))
         return
     if args.leftovers:
-        adapter = importlib.import_module(f'adapters.{args.leftovers}')
+        adapter = adapter_module(args.leftovers)
         if not hasattr(adapter, 'leftovers'):
             print(f"{adapter.NAME}: nothing to list or delete through the API; what the provider keeps is in the adapter's docstring")
             return
@@ -156,7 +175,7 @@ def main() -> None:
     if not args.provider:
         ap.error('--provider, --check, --show or --leftovers')
 
-    adapter = importlib.import_module(f'adapters.{args.provider}')
+    adapter = adapter_module(args.provider)
     require(*adapter.KEYS)
     if hasattr(adapter, 'prepare'):
         adapter.prepare(args)

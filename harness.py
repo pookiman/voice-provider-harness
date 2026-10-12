@@ -228,7 +228,7 @@ class Bridge:
     """`dump-request.mjs <module> --serve`: one JSON line out, one back, so an adapter can ask your server's own
     function for a request instead of Python rebuilding it. HARNESS_MODULE names the module (default: the
     example builder); HARNESS_NODE the command that runs the script (default: node, which strips TypeScript
-    types itself from Node 23.6; use "npx tsx" for older Node or for TypeScript that needs a compiler)."""
+    types itself from Node 22.18; use "npx tsx" for older Node or for TypeScript that needs a compiler)."""
 
     def __init__(self, module: str | None = None):
         module = module or os.environ.get('HARNESS_MODULE') or str(EXAMPLES / 'request-builder.example.ts')

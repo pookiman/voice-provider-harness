@@ -25,7 +25,7 @@ dated snapshot; vendors change models and prices under you.
 
 ## Quick start
 
-You need Python 3.11+, ffmpeg (with ffprobe) on the PATH, and Node 23.6+, which runs a TypeScript builder
+You need Python 3.11+, ffmpeg (with ffprobe) on the PATH, and Node 22.18+, which runs a TypeScript builder
 directly; on older Node, use `npx tsx` wherever `node` appears below.
 
 ```

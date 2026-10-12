@@ -14,7 +14,7 @@
  * The template records the SHA-256 of JSON.stringify(body), the bytes your server would send; harness.py
  * proves Python serialises the body to the same bytes before an adapter puts a clip where the placeholder is.
  *
- * Node 23.6 and later import a .ts module by stripping its types. For older Node, or TypeScript that needs a
+ * Node 22.18 and later import a .ts module by stripping its types. For older Node, or TypeScript that needs a
  * compiler (enums, path aliases), run it as  npx tsx dump-request.mjs …  instead.
  *
  * --serve reads lines like {"op":"call","export":"textRequest","args":[context, "transcript", "he"]} and
