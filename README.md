@@ -2,7 +2,7 @@
 
 A small harness for choosing a voice provider by measuring **your contract**, not the vendor: the request your
 server already sends, the function call it expects back, scored the way your app would apply it. It
-accompanies the article *Measure the contract, not the vendor*.
+accompanies the article [Measure the contract, not the vendor](https://yoyoeuro.wixsite.com/thepm/post/voice-ai-evaluation-harness).
 
 **The one rule: the harness sends what production sends.** Your server's request builder is imported where it
 stands and written to `request-template.json`, and every adapter starts from that file:
