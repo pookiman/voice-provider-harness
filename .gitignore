@@ -1,0 +1,11 @@
+# Recordings, results and the generated request never enter git: recordings are people, results quote them,
+# and the request template is regenerated from your server's code rather than committed, so it cannot drift.
+# Keys are never in a file at all; they live in the shell's environment.
+clips/
+results/
+.venv/
+.env*
+!.env.example
+request-template.json
+*.wav
+__pycache__/

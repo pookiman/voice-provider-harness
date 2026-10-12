@@ -1,0 +1,18 @@
+{
+  "today": "2026-03-02",
+  "weekday": "Monday",
+  "speaker": "רות",
+  "members": ["רות", "אמיר", "שירה"],
+  "aliases": { "רות": "Ruth", "אמיר": "Amir", "שירה": "Shira" },
+  "languages": ["he", "en"],
+  "tasks": [
+    { "title": "לתקן את השער", "due": "2026-03-04", "who": ["אמיר"] },
+    { "title": "Order mulch for the north beds", "due": "2026-03-06", "who": ["רות"] },
+    { "title": "לנקות את המחסן", "due": "2026-03-03", "who": ["רות"] }
+  ],
+  "items": ["שקי קומפוסט", "seed trays", "כפפות עבודה"],
+  "events": [
+    { "title": "Work day", "date": "2026-03-07", "time": "09:00" },
+    { "title": "פגישת ועד", "date": "2026-03-09", "time": "19:30" }
+  ]
+}
