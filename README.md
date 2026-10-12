@@ -2,7 +2,7 @@
 
 A small harness for choosing a voice provider by measuring **your contract**, not the vendor: the request your
 server already sends, the function call it expects back, scored the way your app would apply it. It
-accompanies the article [Measure the contract, not the vendor](ARTICLE_URL).
+accompanies the article *Measure the contract, not the vendor*.
 
 **The one rule: the harness sends what production sends.** Your server's request builder is imported where it
 stands and written to `request-template.json`, and every adapter starts from that file:
